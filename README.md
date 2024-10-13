@@ -1,37 +1,37 @@
-# 🪙 CryptoBot for Telegram
-Telegram bot that shows price of cryptocurrencies
+# 🪙 CryptoBot для Telegram
+Телеграм бот, який показує ціни на криптовалюти
 
-[Try the my bot](https://t.me/CCryptoBBot)
+[Спробуйте мого бота] (https://t.me/CCryptoBBot)
 
-About
+Про бота
 ------------
-**A simple telegram bot that shows the price of cryptocurrencies. Used by the Cryptocompare API. The bot also works in group chats.**
+**Простий телеграм-бот, який показує ціну криптовалют. Використовує API Cryptocompare. Бот також працює в групових чатах**
 
-Installation
+Встановлення
 ------------
 ```shell
-# Clone the repository
+# Клонування
 $ git clone https://github.com/onilyxe/CryptoBot.git
 
-# Change the working directory to CryptoBot
+# Змініть робочу директорію на CryptoBot
 $ cd CryptoBot
 ```
 
-Configuring
+Налаштування
 ------------
-**Open the `cryptobot.py` configuration file with a text editor and set the token on line 7**
+**Відкрий `cryptobot.py` у текстовому редакторі та встановіть токен у рядку 17**
 ```ini
 TOKEN = '0000000000:0000000000000000000000000000000000'
 ```
-* `TOKEN` is token for your Telegram bot. You can get it here: [BotFather](https://t.me/BotFather)
+* `TOKEN` це токен для вашого Telegram-бота. Отримати його можна тут: [BotFather](https://t.me/BotFather)
 
-Running
+Запуск
 ------------
-Using Python
+Юзай Python
 ```shell
-# Install requirements
+# Встановіть залежності
 $ python3 -m pip install -r requirements.txt
 
-# Run script
+# Запустити скрипт
 $ python3 cryptobot.py
 ```
