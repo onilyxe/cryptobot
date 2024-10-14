@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import cryptocompare
+import requests
 import datetime
 import aiogram
 import asyncio
@@ -46,6 +47,33 @@ async def send_help_message(message: types.Message):
         "/h `[CRYPTO]` `[PERIOD]` — Історія ціни криптовалюти за вказаний період (7, 30, 60, 90, 365 або 'рік')\n"
         "/i `[CRYPTO]` — Інформація про криптовалюту\n"
     )
+
+
+# Обробник команди /fg
+@router.message(Command('fg'))
+async def get_fear_and_greed_index(message: types.Message):
+    try:
+        response = requests.get('https://api.alternative.me/fng/?limit=1')
+        if response.status_code == 200:
+            data = response.json()
+            value = data['data'][0]['value']
+            value_classification = data['data'][0]['value_classification']
+            timestamp = data['data'][0]['timestamp']
+            readable_date = datetime.datetime.fromtimestamp(int(timestamp)).strftime('%d.%m.%Y')
+
+            message_text = (
+                f"{value_classification} - *{value}*/100\n\n"
+                f"🚀 *Індекс страху і жадності*"
+                f"\n⏰ Оновлено: {readable_date}"
+            )
+
+            await message.reply(message_text)
+        else:
+            await message.reply("⚠️ Неможливо отримати дані")
+    except Exception as e:
+        await message.reply(f"⚠️ Сталася помилка: {e}")
+        print(f"Ошибка: {e}")
+
 
 # Обробник команди /p
 @router.message(Command('p'))
