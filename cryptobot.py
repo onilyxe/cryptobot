@@ -235,7 +235,7 @@ async def main():
     commands = [
     BotCommand(command="/p", description="- [CRYPTO] [FIAT] - Ціна криптовалюти"),
     BotCommand(command="/h", description="- [CRYPTO] - Історія ціни криптовалюти"),
-    BotCommand(command="/i", description="- [CRYPTO] - Інформація про криптовалюту")
+    BotCommand(command="/i", description="- [CRYPTO] - Інформація про криптовалюту"),
     BotCommand(command="/fg", description="- Індекс страху та жадібності")]
 
     # Встановлюємо команди бота
