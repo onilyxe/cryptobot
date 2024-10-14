@@ -46,6 +46,7 @@ async def send_help_message(message: types.Message):
         "/p `[CRYPTO]` `[FIAT]` — Ціна криптовалюти\n"
         "/h `[CRYPTO]` `[PERIOD]` — Історія ціни криптовалюти за вказаний період (7, 30, 60, 90, 365 або 'рік')\n"
         "/i `[CRYPTO]` — Інформація про криптовалюту\n"
+        "/fg — Індекс страху та жадібності\n"
     )
 
 
@@ -234,7 +235,8 @@ async def main():
     commands = [
     BotCommand(command="/p", description="- [CRYPTO] [FIAT] - Ціна криптовалюти"),
     BotCommand(command="/h", description="- [CRYPTO] - Історія ціни криптовалюти"),
-    BotCommand(command="/i", description="- [CRYPTO] - Інформація про криптовалюту")]
+    BotCommand(command="/i", description="- [CRYPTO] - Інформація про криптовалюту")
+    BotCommand(command="/fg", description="- Індекс страху та жадібності")]
 
     # Встановлюємо команди бота
     await bot.set_my_commands(commands)
