@@ -34,7 +34,7 @@ for coin in crypto_list:
 # Обробник команди /start
 @router.message(Command('start'))
 async def send_start_message(message: types.Message):
-    await message.reply("👋 Привіт. Я вмію показувати поточну ціну криптовалют.\n✍️ Напиши /help, щоб дізнатися, як мною користуватися")
+    await message.reply("👋 Привіт. Я вмію показувати поточну ціну криптовалют, та інше. Напиши /help, щоб дізнатися, як мною користуватися")
 
 # Обробник команди /help
 @router.message(Command('help'))
@@ -43,10 +43,11 @@ async def send_help_message(message: types.Message):
         "⚙️ Список команд:\n"
         "/start — запустити бота\n"
         "/help — це повідомлення\n"
-        "/p `[CRYPTO]` `[FIAT]` — Ціна криптовалюти\n"
-        "/h `[CRYPTO]` `[PERIOD]` — Історія ціни криптовалюти за вказаний період (7, 30, 60, 90, 365 або 'рік')\n"
-        "/i `[CRYPTO]` — Інформація про криптовалюту\n"
-        "/fg — Індекс страху та жадібності\n"
+        "/p `[amount]` `[crypto]` `[fiat]` — ціна криптовалюти\n"
+        "/h `[crypto]` `[repiod]` — історія ціни криптовалюти за вказаний період (7, 30, 60, 90, 365 або 'рік')\n"
+        "/i `[crypto]` — інформація про криптовалюту\n"
+        "/fg — індекс страху та жадібності\n"
+        "\nУ команді /p не обов'язково вказувати всі три значення"
     )
 
 
@@ -72,7 +73,7 @@ async def get_fear_and_greed_index(message: types.Message):
         else:
             await message.reply("⚠️ Неможливо отримати дані")
     except Exception as e:
-        await message.reply(f"⚠️ Сталася помилка: {e}")
+        await message.reply(f"⚠️: {e}")
         print(f"Ошибка: {e}")
 
 
@@ -80,26 +81,54 @@ async def get_fear_and_greed_index(message: types.Message):
 @router.message(Command('p'))
 async def get_crypto_price(message: types.Message):
     args = message.text.split()
-    crypto_currency = args[1].upper() if len(args) > 1 else "BTC"
-    fiat_currency = args[2].upper() if len(args) > 2 else "USD"
-    
+
     symbols = {
         "USD": "$", 
         "EUR": "€", 
         "UAH": "₴"
     }
 
-    price = cryptocompare.get_price(crypto_currency, currency=fiat_currency, full=False)
+    try:
+        if len(args) == 1:
+            crypto_currency = "BTC"
+            fiat_currency = "USD"
+            amount = 1
+        elif len(args) == 2:
+            crypto_currency = args[1].upper()
+            fiat_currency = "USD"
+            amount = 1
+        elif len(args) == 3:
+            try:
+                amount = float(args[1])
+                crypto_currency = args[2].upper()
+                fiat_currency = "USD"
+            except ValueError:
+                crypto_currency = args[1].upper()
+                fiat_currency = args[2].upper()
+                amount = 1
+        elif len(args) == 4:
+            amount = float(args[1])
+            crypto_currency = args[2].upper()
+            fiat_currency = args[3].upper()
+        else:
+            await message.reply("⚠️ Використовуй: /p [amount] [crypto] [fiat]")
+            return
 
-    if not price:
-        await message.reply("⚠️ Неможливо отримати дані для цієї криптовалюти")
-        return
+        price = cryptocompare.get_price(crypto_currency, currency=fiat_currency, full=False)
 
-    currency_symbol = symbols.get(fiat_currency, "")
-    price_value = price[crypto_currency][fiat_currency]
-    # Форматируем цену
-    formatted_price = f"{currency_symbol}{price_value:,.2f}"
-    await message.reply(f"{crypto_currency} до {fiat_currency}:\n{formatted_price}")
+        if not price:
+            await message.reply("⚠️ Неможливо отримати дані")
+            return
+
+        currency_symbol = symbols.get(fiat_currency, "")
+        price_value = price[crypto_currency][fiat_currency] * amount
+        formatted_price = f"{currency_symbol}{price_value:,.2f}"
+        await message.reply(f"{amount} {crypto_currency} до {fiat_currency}\n=*{formatted_price}*")
+    except ValueError:
+        await message.reply("⚠️ Неможливо отримати дані")
+    except Exception as e:
+        await message.reply(f"⚠️: {e}")
+        print(f"Ошибка: {e}")
 
 # Обробник команди /h
 @router.message(Command('h'))
@@ -133,7 +162,7 @@ async def get_crypto_history(message: types.Message):
         )
 
         if not history_data:
-            await message.reply("⚠️ Неможливо отримати дані для цієї криптовалюти")
+            await message.reply("⚠️ Неможливо отримати дані")
             return
 
         dates = [data['time'] for data in history_data]
@@ -162,7 +191,7 @@ async def get_crypto_history(message: types.Message):
             os.remove(image_path)
 
     except Exception as e:
-        await message.reply(f"⚠️ Сталася помилка: {e}")
+        await message.reply(f"⚠️: {e}")
         print(f"Ошибка: {e}")
 
 # Обработчик команды /i
@@ -174,13 +203,13 @@ async def get_crypto_info(message: types.Message):
 
         coin_ids = symbol_to_ids.get(user_input)
         if not coin_ids:
-            await message.reply("⚠️ Неможливо отримати дані для цієї криптовалюти")
+            await message.reply("⚠️ Неможливо отримати дані")
             return
 
         market_data = cg.get_coins_markets(vs_currency='usd', ids=coin_ids)
 
         if not market_data:
-            await message.reply("⚠️ Неможливо отримати дані для цієї криптовалюти")
+            await message.reply("⚠️ Неможливо отримати дані")
             return
 
         coin = max(market_data, key=lambda x: x.get('market_cap', 0))
@@ -224,7 +253,7 @@ async def get_crypto_info(message: types.Message):
         await message.reply(message_text)
 
     except Exception as e:
-        await message.reply(f"⚠️ Сталася помилка: {e}")
+        await message.reply(f"⚠️: {e}")
         print(f"Ошибка: {e}")
 
 # Запуск бота
@@ -233,12 +262,11 @@ async def main():
     dp.include_router(router)
 
     commands = [
-    BotCommand(command="/p", description="- [CRYPTO] [FIAT] - Ціна криптовалюти"),
-    BotCommand(command="/h", description="- [CRYPTO] - Історія ціни криптовалюти"),
-    BotCommand(command="/i", description="- [CRYPTO] - Інформація про криптовалюту"),
-    BotCommand(command="/fg", description="- Індекс страху та жадібності")]
+    BotCommand(command="/p", description="- [amount] [crypto] [fiat] - ціна криптовалюти"),
+    BotCommand(command="/h", description="- [crypto] - історія ціни криптовалюти"),
+    BotCommand(command="/i", description="- [crypto] - інформація про криптовалюту"),
+    BotCommand(command="/fg", description="- індекс страху та жадібності")]
 
-    # Встановлюємо команди бота
     await bot.set_my_commands(commands)
 
     await dp.start_polling(bot)
