@@ -155,10 +155,13 @@ async def get_crypto_history(message: types.Message):
 
         limit = period - 1
 
+        current_timestamp = int(datetime.datetime.now().timestamp())
+
         history_data = cryptocompare.get_historical_price_day(
             crypto_currency,
             currency="USD",
-            limit=limit
+            limit=limit,
+            toTs=current_timestamp
         )
 
         if not history_data:
