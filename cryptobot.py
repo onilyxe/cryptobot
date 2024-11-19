@@ -13,6 +13,7 @@ from pycoingecko import CoinGeckoAPI
 from aiogram.types import BotCommand
 from aiogram.filters import Command
 from collections import defaultdict
+import matplotlib.dates as mdates
 
 # Задаємо токен і створюємо об'єкт бота із зазначенням parse_mode через DefaultBotProperties
 TOKEN = '0000000000:0000000000000000000000000000000000'
@@ -168,16 +169,18 @@ async def get_crypto_history(message: types.Message):
             await message.reply("⚠️ Неможливо отримати дані")
             return
 
-        dates = [data['time'] for data in history_data]
+        dates = [datetime.datetime.fromtimestamp(data['time']) for data in history_data]
         prices = [data['close'] for data in history_data]
 
-        readable_dates = [datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d') for ts in dates]
-
         plt.figure(figsize=(10, 6))
-        plt.plot(readable_dates, prices, label=f"{crypto_currency} Price (USD)")
+        plt.plot(dates, prices, label=f"{crypto_currency} Price (USD)")
         plt.xlabel("Дата")
         plt.ylabel("Ціна в USD")
         plt.title(f"{crypto_currency} — Історія ціни за останні {period} днів")
+
+        plt.gca().xaxis.set_major_locator(mdates.MonthLocator())
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+
         plt.xticks(rotation=45)
         plt.tight_layout()
         plt.grid(True)
