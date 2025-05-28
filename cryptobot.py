@@ -31,7 +31,9 @@ symbol_to_ids = defaultdict(list)
 for coin in crypto_list:
     symbol_to_ids[coin['symbol'].lower()].append(coin['id'])
 
-
+def parse_amount(raw: str) -> float:
+    return float(raw.replace(',', '.').strip())
+    
 # Обробник команди /start
 @router.message(Command('start'))
 async def send_start_message(message: types.Message):
@@ -74,8 +76,8 @@ async def get_fear_and_greed_index(message: types.Message):
         else:
             await message.reply("⚠️ Неможливо отримати дані")
     except Exception as e:
-        await message.reply(f"⚠️: {e}")
-        print(f"Ошибка: {e}")
+        await message.reply(f"⚠️: {e}", parse_mode=None)
+        print(f"Помилка: {e}")
 
 
 # Обробник команди /p
@@ -100,7 +102,7 @@ async def get_crypto_price(message: types.Message):
             amount = 1
         elif len(args) == 3:
             try:
-                amount = float(args[1])
+                amount = parse_amount(args[1])
                 crypto_currency = args[2].upper()
                 fiat_currency = "USD"
             except ValueError:
@@ -108,7 +110,7 @@ async def get_crypto_price(message: types.Message):
                 fiat_currency = args[2].upper()
                 amount = 1
         elif len(args) == 4:
-            amount = float(args[1])
+            amount = parse_amount(args[1])
             crypto_currency = args[2].upper()
             fiat_currency = args[3].upper()
         else:
@@ -128,8 +130,8 @@ async def get_crypto_price(message: types.Message):
     except ValueError:
         await message.reply("⚠️ Неможливо отримати дані")
     except Exception as e:
-        await message.reply(f"⚠️: {e}")
-        print(f"Ошибка: {e}")
+        await message.reply(f"⚠️: {e}", parse_mode=None)
+        print(f"Помилка: {e}")
 
 # Обробник команди /h
 @router.message(Command('h'))
@@ -197,8 +199,8 @@ async def get_crypto_history(message: types.Message):
             os.remove(image_path)
 
     except Exception as e:
-        await message.reply(f"⚠️: {e}")
-        print(f"Ошибка: {e}")
+        await message.reply(f"⚠️: {e}", parse_mode=None)
+        print(f"Помилка: {e}")
 
 # Обработчик команды /i
 @router.message(Command('i'))
@@ -259,8 +261,8 @@ async def get_crypto_info(message: types.Message):
         await message.reply(message_text)
 
     except Exception as e:
-        await message.reply(f"⚠️: {e}")
-        print(f"Ошибка: {e}")
+        await message.reply(f"⚠️: {e}", parse_mode=None)
+        print(f"Помилка: {e}")
 
 # Запуск бота
 async def main():
